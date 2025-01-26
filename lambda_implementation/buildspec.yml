@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22.x
+    commands:
+      - npm install -g serverless
+      - npm run build
+  
+  pre_build:
+    commands:
+      - npm run test
+
+  build:
+    commands:
+      - serverless deploy --stage $STAGE_NAME
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: '.'

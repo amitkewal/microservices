@@ -1,0 +1,22 @@
+{
+    "version": "2018-05-29",
+    "operation": "DeleteItem",
+    "key": {
+        "ProductId": $util.dynamodb.toDynamoDBJson($ctx.arg.ProductId)
+    },
+    "update": {
+        "expressions": "SET #name = :name, description = :description", price = :price, category = :category, stock = :stock", updatedAt = :updatedAt",
+        "expressionNames": {
+            "#name": "name"
+        },
+        "expressionValues": {
+            ":name": $util.dynamodb.toDynamoDBJson($ctx.arg.input.Name),
+            ":description": $util.dynamodb.toDynamoDBJson($ctx.arg.input.Description),
+            ":price": $util.dynamodb.toDynamoDBJson($ctx.arg.input.Price),
+            ":category": $util.dynamodb.toDynamoDBJson($ctx.arg.input.Category),
+            ":stock": $util.dynamodb.toDynamoDBJson($ctx.arg.input.Stock),
+            ":updatedAt": $util.dynamodb.toDynamoDBJson($util.time.nowISO8601())
+        }
+    }
+
+}

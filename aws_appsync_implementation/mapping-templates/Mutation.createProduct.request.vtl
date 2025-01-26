@@ -1,0 +1,16 @@
+{
+    "version": "2018-05-29",
+    "operation": "PutItem",
+    "key": {
+        "id": $util.dynamodb.toDynamoDBJson($util.autoId())
+    },
+    "attributeValues": {
+        "Name": $util.dynamodb.toDynamoDBJson($ctx.args.input.Name),
+        "Description": $util.dynamodb.toDynamoDBJson($ctx.args.input.Description),
+        "Price": $util.dynamodb.toDynamoDBJson($ctx.args.input.Price),
+        "Category": $util.dynamodb.toDynamoDBJson($ctx.args.input.Category),
+        "Stock": $util.dynamodb.toDynamoDBJson($ctx.args.input.Stock),
+        "CreatedAt": $util.dynamodb.toDynamoDBJson($util.time.nowISO8601()),
+        "UpdatedAt": $util.dynamodb.toDynamoDBJson($util.time.nowISO8601())
+    }
+}

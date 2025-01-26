@@ -1,0 +1,140 @@
+service: ecommerce-appsync
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: eu-west-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:${self.provider.region}:${self.provider.accountId}:table/ecommerce-products"
+        - "arn:aws:dynamodb:${self.provider.region}:${self.provider.accountId}:table/ecommerce-products/*"
+        - "arn:aws:dynamodb:${self.provider.region}:${self.provider.accountId}:table/ProductTaxonomyAttributes/*"
+  
+  
+custom:
+  appSync:
+    name: ${self.service}-api
+    authenticationType: API_KEY
+    schema: schema.graphql
+    apiKeys:
+      - name: DefaultApiKey
+        description: Default API Key
+        expiresAfter: 365d 
+    mappingTemplates:
+      - type: Query
+        field: getProducts
+        dataSource: ProductsTable
+        request: mapping-templates/Query.getProduct.request.vtl
+        response: mapping-templates/Query.getProduct.response.vtl
+        
+      - type: Query
+        field: listProducts
+        dataSource: ProductsTable
+        request: mapping-templates/Query.listProduct.request.vtl
+        response: mapping-templates/Query.listProduct.response.vtl
+        
+      - type: Query
+        field: getProductTaxonomy
+        dataSource: ProductTaxonomyTable
+        request: mapping-templates/Query.getProductTaxanomy.request.vtl
+        response: mapping-templates/Query.getProductTaxanomy.response.vtl
+        
+      - type: Query
+        field: listProductTaxonomy
+        dataSource: ProductTaxonomyTable
+        request: mapping-templates/Query.listProductTaxanomy.request.vtl
+        response: mapping-templates/Query.listProductTaxanomy.request.vtl
+        
+      - type: Mutation
+        field: createProduct
+        dataSource: ProductsTable
+        request: mapping-templates/Mutation.createProduct.request.vtl
+        response: mapping-templates/Mutation.createProduct.response.vtl
+
+      - type: Mutation
+        field: updateProduct
+        dataSource: ProductsTable
+        request: mapping-templates/Mutation.updateProduct.request.vtl
+        response: mapping-templates/Mutation.updateProduct.response.vtl
+
+      - type: Mutation
+        field: deleteProduct
+        dataSource: ProductsTable
+        request: mapping-templates/Mutation.deleteProduct.request.vtl
+        response: mapping-templates/Mutation.deleteProduct.response.vtl
+
+      - type: Mutation
+        field: createProductTaxonomy
+        dataSource: ProductTaxonomyTable
+        request: mapping-templates/Mutation.createProductTaxonomy.request.vtl
+        response: mapping-templates/Mutation.createProductTaxonomy.response.vtl
+    
+
+plugins:
+  - serverless-appsync-plugin
+
+
+resources:
+# Product Data Model in DynamoDB
+# Table Name: Products
+# ProductId : Unique identifier for each product.
+# Name : Name of the product.
+# Description : A detailed description of the product.
+# Price : The price of the product.
+# Category : Category to which the product belongs.
+# Stock : Inventory count.
+# CreatedAt : Timestamp when the product was added.
+# UpdatedAt : Timestamp of the last update to the product.
+
+  ProductsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:provider.environment.PRODUCTS_TABLE}
+      KeySchema:
+        - AttributeName: ProductId
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: ProductId
+          AttributeType: S
+
+# Table Name: ProductTaxonomyAttributes
+
+# TaxonomyId : A unique identifier for each category or tag.
+# Name : The name of the category or tag.
+# Description : A brief description of the category or tag.
+# ParentId : An identifier linking to the parent category for hierarchical structures. For top-level categories, this could be null or a specific value like "root".
+# Type : Distinguishes between different types of taxonomy, such as 'category' or 'tag'.
+  ProductTaxonomyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:provider.environment.PRODUCTS_TAXANOMY_TABLE_NAME}
+      KeySchema:
+        - AttributeName: TaxonomyId
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: TaxonomyId
+          AttributeType: S
+        - AttributeName: ParentId
+          AttributeType: S
+        - AttributeName: Name
+          AttributeType: S
+        - AttributeName: Description
+          AttributeType: S
+        - AttributeName: Type
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: ParentIdIndex
+          KeySchema:
+            - AttributeName: ParentId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+

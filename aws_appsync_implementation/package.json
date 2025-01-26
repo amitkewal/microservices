@@ -1,0 +1,15 @@
+{
+    "name": "ecommerce-product-service",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest",
+        "deploy": "serverless deploy"
+    },
+    "dependencies": {
+        "jest": "^27.0.6",
+        "serverless": "^2.57.0",
+        "serverless-appsync-plugin": "^1.14.0"
+    }
+}

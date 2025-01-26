@@ -17,13 +17,15 @@ provider:
       Resource:
         - "arn:aws:dynamodb:${self.provider.region}:${self.provider.accountId}:table/ecommerce-products"
         - "arn:aws:dynamodb:${self.provider.region}:${self.provider.accountId}:table/ecommerce-products/*"
+        - "arn:aws:dynamodb:${self.provider.region}:${self.provider.accountId}:table/ProductTaxonomyAttributes/*"
 
   environment:
-    TABLE_NAME: "ecommerce-products"
+    PRODUCTS_TABLE_NAME: "Products"
+    PRODUCTS_TAXANOMY_TABLE_NAME: "ProductTaxonomyAttributes"
 
 functions:
   getProducts:
-    handler: products.get
+    handler: src/handlers/product.get
     events:
       - http:
           path: products/{id}
@@ -31,7 +33,7 @@ functions:
           cors: true
 
   createProduct:
-    handler: products.create
+    handler: src/handlers/product.create
     events:
       - http:
           path: products
@@ -39,7 +41,7 @@ functions:
           cors: true
 
   updateProduct:
-    handler: products.update
+    handler: src/handlers/product.update
     events:
       - http:
         path: products/{id}
@@ -47,7 +49,7 @@ functions:
         cors: true
 
   deleteProduct:
-    handler: products.delete
+    handler: src/handlers/product.delete
     events:
       - http:
         path: products/{id}
@@ -70,7 +72,7 @@ resources:
   ProductsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Products
+      TableName: ${self:provider.environment.PRODUCTS_TABLE}
       KeySchema:
         - AttributeName: ProductId
           KeyType: HASH
@@ -88,7 +90,7 @@ resources:
   ProductTaxonomyTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: ProductTaxonomyAttributes
+      TableName: ${self:provider.environment.PRODUCTS_TAXANOMY_TABLE_NAME}
       KeySchema:
         - AttributeName: TaxonomyId
           KeyType: HASH
@@ -111,6 +113,3 @@ resources:
           Projection:
             ProjectionType: ALL
 
-# Table Name: ProductAttributes
-
-# ProductId : A unique identifier for each product.

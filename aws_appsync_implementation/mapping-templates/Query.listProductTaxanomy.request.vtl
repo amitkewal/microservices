@@ -1,0 +1,16 @@
+{
+    "version": "2018-05-29",
+    "operation": #if($ctx.args.ParentId) "Query" #else "Scan" #end,
+    #if($ctx.args.ParentId)
+    "index": "ParentIndex",
+    "query": {
+        "expression": "ParentId = :parentId",
+        "expressionValues": {
+            ":parentId": $util.dynamodb.toDynamoDBJson($ctx.args.ParentId)
+        }
+    },
+    #end
+    "limit": $ctx.defaultIfNull($ctx.args.limit, 20),
+    "nextToken": $util.toJson($util.defaultIfNull($ctx.args.nextToken, null)),
+    
+}

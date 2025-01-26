@@ -1,0 +1,14 @@
+{
+    "version": "2018-05-29",
+    "operation": "PutItem",
+    "key": {
+        "TaxonomyId": $util.dynamodb.toDynamoDBJson($util.autoId())
+    },
+    "attributeValues": {
+        "Name": $util.dynamodb.toDynamoDBJson($ctx.args.input.Name),
+        "Description": $util.dynamodb.toDynamoDBJson($ctx.args.input.Description),
+        "ParentId": $util.dynamodb.toDynamoDBJson($ctx.args.input.ParentId),
+        "Type": $util.dynamodb.toDynamoDBJson($ctx.args.input.Type) 
+    },
+    "tableName": "Products"
+}
